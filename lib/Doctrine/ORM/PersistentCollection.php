@@ -887,4 +887,41 @@ final class PersistentCollection implements Collection, Selectable
             ? new LazyCriteriaCollection($persister, $criteria)
             : new ArrayCollection($persister->loadCriteria($criteria));
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function sum($property, $usePropertyAsMethod = false)
+    {
+        if($this->initialized) {
+            return $this->coll->sum($property, $usePropertyAsMethod);
+        }
+
+        $this->initialize();
+
+        $sum = 0;
+        if($usePropertyAsMethod) {
+            $method = $property;
+        }
+        else {
+            $method = 'get' . ucfirst($property);
+        }
+
+        foreach($this->coll as $element) {
+            if(method_exists($element, $method)) {
+                $propertyValue = call_user_func(array($element, $method));
+                if(is_int($propertyValue)) {
+                    $sum += $propertyValue;
+                }
+                else {
+                    throw new \RuntimeException(sprintf("Computable property must be integer; %s given. Please check property name you passing into sum method", gettype($propertyValue)));
+                }
+            }
+            else {
+                throw new \RuntimeException(sprintf("Instance of %s class does not have method %s", get_class($element), $method));
+            }
+        }
+
+        return $sum;
+    }
 }
