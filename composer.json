@@ -16,7 +16,7 @@
         "php": ">=5.3.2",
         "ext-pdo": "*",
         "aaleksu/collections": "*",
-        "doctrine/dbal": "*", // ">=2.5-dev,<2.6-dev",
+        "doctrine/dbal": "*",
         "symfony/console": "2.*"
     },
     "require-dev": {
